@@ -17,6 +17,11 @@ color_orange = '\033[30;43m'
 color_blue = '\033[30;44m'
 color_normal = '\033[0m'
 
+black = range(1, 14)
+red = range(14, 27)
+orange = range(27, 40)
+blue = range(40, 53)
+
 
 def hand_gen(pool):
     hand = []
@@ -42,18 +47,20 @@ def hand_print(hand: list):
 
 def tile_print(tile: int):
     if tile == 0:
-        print(color_black + '☺' + color_normal, end=' ')
+        print(color_black + '☺ ' + color_normal, end=' ')
     out = tile % 13
     if not out:
         out = 13
-    if (1 <= tile <= 13):
+    if tile in black:
         print(color_black + str(out) + color_normal, end=' ')
-    if (14 <= tile <= 26):
+    if tile in red:
         print(color_red + str(out) + color_normal, end=' ')
-    if (27 <= tile <= 39):
+    if tile in orange:
         print(color_orange + str(out) + color_normal, end=' ')
-    if (40 <= tile <= 54):
+    if tile in blue:
         print(color_blue + str(out) + color_normal, end=' ')
+    # if out <= 9:
+        # print(end=' ') # padding for nicer cols
 
 
 def run_check(hand):
@@ -92,25 +99,18 @@ def group_check(hand):
     return False
 
 
+"""
+Sets with 3 elements don't branch the game tree
+Each group with 4 tiles creates 4 more options in the game tree
+Runs can be 3 < n < 13:
+Ways to divide a string of n into segments, each one =>3
+For runs 5 < n, we have the option of spliting them into sub-runs,
+Thankfully, this is rare, so it almost always will not affect runtime4
+"""
+
+
 def turn(hand):
     pass
-
-# recieves list of groups, returns score
-
-
-def score_groups(groups):
-    for group in groups:
-        for tile in group:
-            if tile == 0:  # jokers, implement later
-                continue
-            to_add = tile % 13
-            if to_add == 0:
-                score += 13
-            else:
-                score += to_add
-    return score
-
-
 
 # def initial_meld(hand):
 #     """sum of opening play must be >- 30"""

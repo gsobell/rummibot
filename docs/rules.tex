@@ -1,0 +1,48 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+
+\usepackage{hyperref} % Hyperlink
+\hypersetup{
+  colorlinks   = true,  % Colors links instead of ugly boxes
+  urlcolor     = black, % Color for external hyperlinks
+  linkcolor    = black, % Color of internal links
+  citecolor    = red    % Color of citations
+}
+
+%opening
+\title{How to Play Rummikub}
+\date{}
+\author{Rules (Abridged)}
+
+\begin{document}
+\maketitle
+% \subsection{}
+These are selections from the official rules, as relevant to computer Rummikub.
+Full instructions can be found \href{https://rummikub.com/rules/}{here}.
+
+\section{Object of The Game}
+To be the ﬁrst player to play all the tiles from your rack by forming them into sets.
+
+\section{Sets}\label{sets}
+There are two kinds of sets:
+\begin{enumerate}
+ \item A \emph{group} is a set of either three or four tiles of the same number in different colors.
+ \item A \emph{run} is a set of three or more consecutive numbers all in the same color. The number 1 is always played as the lowest number, it cannot follow the number 13.
+\end{enumerate}
+
+\section{Gameplay}
+Each tile is worth its face value. In order to make an initial meld, each player must place tiles on the table in one or more sets that total at least 30 points. These points must come from the tiles on each player’s rack; for their initial meld, players may not use tiles already played on the table. A joker used in the initial meld scores the value of the tile it represents. When players cannot play any tiles from their racks, or purposely choose not to, they must draw a tile from the pool. After they draw, their turn is over. On turns after a player has made their initial meld, that player can build onto other sets on the table with tiles from their rack.\\
+On any turn that a player cannot add onto another set or play a set from their rack, that player picks a tile from the pool and their turn ends. Players cannot lay down a tile they just drew; they must wait until their next turn to play this tile. Play continues until one player empties their rack. This ends the game and players tally their points
+% (see Scoring)
+. If there are no more tiles in the pool but no player has emptied his/her rack, play continues until no more plays can be made. This ends the game.
+
+\section{Piece Manipulation}
+Players try to table the greatest amount of tiles by rearranging or adding to sets which are already on the table. Sets can be manipulated in many ways
+% (examples follow)
+as long as at the end of each round only legitimate sets remain and no loose tiles are left over.
+
+\section{Joker}
+There are two jokers in the game. Each joker can be used as any tile in a set, and its number and color are that of the tile needed to complete the set. On future turns, a joker can be retrieved from a set on the table by a player who can replace it during their turn with any tiles that can keep the set legitimate. This tile can come from the table or from a player’s rack. In the case of a group of three tiles, the joker can be replaced by a tile of either of the missing colors.
+When a player retrieves a joker, the joker will once again have any value or color. However, a player who retrieves a joker must play the joker on their current turn to make a new set, and must also use at least one tile from their rack on that turn (just as on any other turn). A player cannot retrieve a joker before they have played their initial meld.
+
+\end{document}

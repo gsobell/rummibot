@@ -11,16 +11,22 @@ jokers = (0,   0)
 """
 from random import randrange
 
-black = '\033[37;100m'
-red = '\033[30;41m'
-orange = '\033[30;43m'
-blue = '\033[30;44m'
-normal = '\033[0m'
-
-# implement game class to store tiles, played
+color_black = '\033[37;100m'
+color_red = '\033[30;41m'
+color_orange = '\033[30;43m'
+color_blue = '\033[30;44m'
+color_normal = '\033[0m'
 
 
-def tile_gen() -> list:
+def hand_gen(pool):
+    hand = []
+    for i in range(1, 14):
+        k = randrange(len(pool))
+        hand.append(pool.pop(k))
+    return pool, hand
+
+
+def pool_gen() -> list:
     tiles = []
     for i in range(53):
         tiles.append(i)
@@ -35,26 +41,19 @@ def hand_print(hand: list):
 
 
 def tile_print(tile: int):
+    if tile == 0:
+        print(color_black + '☺' + color_normal, end=' ')
+    out = tile % 13
+    if not out:
+        out = 13
     if (1 <= tile <= 13):
-        tile = tile % 13
-        if not tile:
-            tile = 13
-        print(black + str(tile) + normal, end=' ')
+        print(color_black + str(out) + color_normal, end=' ')
     if (14 <= tile <= 26):
-        tile = tile % 13
-        if not tile:
-            tile = 13
-        print(red + str(tile) + normal, end=' ')
+        print(color_red + str(out) + color_normal, end=' ')
     if (27 <= tile <= 39):
-        tile = tile % 13
-        if not tile:
-            tile = 13
-        print(orange + str(tile) + normal, end=' ')
+        print(color_orange + str(out) + color_normal, end=' ')
     if (40 <= tile <= 54):
-        tile = tile % 13
-        if not tile:
-            tile = 13
-        print(blue + str(tile) + normal, end=' ')
+        print(color_blue + str(out) + color_normal, end=' ')
 
 
 def run_check(hand):
@@ -93,17 +92,38 @@ def group_check(hand):
     return False
 
 
-# recieves run/group, checks no duplicates
-def duplicate_remove(list):
-    pass
-
-
 def turn(hand):
     pass
 
+# recieves list of groups, returns score
 
-# sum of opening play must be >- 30
-def opening(hand):
+
+def score_groups(groups):
+    for group in groups:
+        for tile in group:
+            if tile == 0:  # jokers, implement later
+                continue
+            to_add = tile % 13
+            if to_add == 0:
+                score += 13
+            else:
+                score += to_add
+    return score
+
+
+
+# def initial_meld(hand):
+#     """sum of opening play must be >- 30"""
+#     recursive_meld(hand)
+#
+#
+# def recursive_meld(hand, groups=[], path=[]):
+#     """use backtracking to find largest initial_meld """
+#     pass
+#
+
+
+def old_init_meld(hand):
     group = group_check(hand)
     run = run_check(hand)
     score = 0
@@ -132,14 +152,6 @@ def opening(hand):
     return False
 
 
-def hand_gen(pool):
-    hand = []
-    for i in range(1, 14):
-        k = randrange(len(pool))
-        hand.append(pool.pop(k))
-    return pool, hand
-
-
 def draw(pool, hand):
     k = randrange(len(pool))
     hand.append(pool.pop(k))
@@ -147,7 +159,7 @@ def draw(pool, hand):
 
 
 def play():
-    pool = tile_gen()
+    pool = pool_gen()
     pool, hand = hand_gen(pool)
     print(hand)
     hand_print(hand)
@@ -155,7 +167,7 @@ def play():
     hand_print(hand)
     while True:
         hand_print(hand)
-        if opening(hand):
+        if old_init_meld(hand):
             break
         else:
             pool, hand = draw(pool, hand)

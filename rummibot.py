@@ -1,7 +1,17 @@
+#!/usr/bin/env python3
 """
-       ---rummibot---
+          ---rummibot---
+
 'sabra' ruleset is reference version,
 unless otherwise stated
+
+tiles are in hand, pool, or on table
+
+ideas: let 4 x 13 matrix represent tiles,
+each entry represents quantity of tile on table/ in hand
+
+naive/greedy approach: binary tree, compare number of
+tiles used in group v. run, choose greater.
 
 black  = range(1,  14) = [1,  13]
 red    = range(14, 27) = [14, 26]
@@ -10,168 +20,192 @@ blue   = range(40, 53) = [40, 52]
 jokers = (0,   0)
 """
 from random import randrange
+from random import shuffle
 
-color_black = '\033[37;100m'
-color_red = '\033[30;41m'
-color_orange = '\033[30;43m'
-color_blue = '\033[30;44m'
-color_normal = '\033[0m'
+DECKS = 2  # default=2, 106 tiles
 
-black = range(1, 14)
-red = range(14, 27)
-orange = range(27, 40)
-blue = range(40, 53)
+BLACK = range(1, 14)
+RED = range(14, 27)
+ORANGE = range(27, 40)
+BLUE = range(40, 53)
 
+COLORS = [BLACK,
+          RED,
+          ORANGE,
+          BLUE]
 
-def hand_gen(pool):
-    hand = []
-    for i in range(1, 14):
-        k = randrange(len(pool))
-        hand.append(pool.pop(k))
-    return pool, hand
+OUT = {BLACK: '\033[37;100m',
+       RED: '\033[30;41m',
+       ORANGE: '\033[30;43m',
+       BLUE: '\033[30;44m'}
 
-
-def pool_gen() -> list:
-    tiles = []
-    for i in range(53):
-        tiles.append(i)
-        tiles.append(i)
-    return tiles
+NORMAL = '\033[0m'
 
 
-def hand_print(hand: list):
-    for tile in hand:
-        tile_print(tile)
-    print()
-
-
-def tile_print(tile: int):
-    if tile == 0:
-        print(color_black + '☺ ' + color_normal, end=' ')
-    out = tile % 13
-    if not out:
-        out = 13
-    if tile in black:
-        print(color_black + str(out) + color_normal, end=' ')
-    if tile in red:
-        print(color_red + str(out) + color_normal, end=' ')
-    if tile in orange:
-        print(color_orange + str(out) + color_normal, end=' ')
-    if tile in blue:
-        print(color_blue + str(out) + color_normal, end=' ')
-    # if out <= 9:
-        # print(end=' ') # padding for nicer cols
-
-
-def run_check(hand):
-    hand.sort()
-    prev = None
-    run = []
-    for tile in hand:
-        if tile == 0:  # joker clause
-            continue
-        if not prev:
+def run(tiles):
+    """ Finds all runs in input.
+    Does not handle double occurrences"""
+    runs = []
+    for color in COLORS:
+        prev = False
+        run = []
+        for tile in [tile for tile in tiles if tile in color]:
+            if not prev:
+                run.append(tile)
+                prev = tile
+                continue
+            if prev == tile:  # skip over for now
+                continue
+            elif prev + 1 == tile:
+                run.append(tile)
+                prev = tile
+            elif len(run) >= 3:
+                runs.append(run)
+                run = [tile]
+            else:
+                run = [tile]
             prev = tile
-            continue
-        if tile == prev + 1:
-            run.append(tile)
-        elif len(run) >= 3:
-            return run
-        else:
+        if len(run) >= 3:
+            runs.append(run)
             run = []
-        prev = tile
-    return False
+    return runs if runs else False
 
 
-def group_check(hand):
-    for first in hand:
-        if first == 0:  # joker clause
+def group(tiles):
+    """ Returns all groups in input """
+    groups = []
+    tiles = [tile for tile in tiles if tile != 0]  # remove jokers
+    tiles.sort()
+    for first in tiles:
+        if first in flatten(groups):
             continue
         group = [first]
-        for second in hand:
-            if second == 0:  # joker clause
-                continue
+        for second in tiles:
             if (first % 13) == (second % 13):
                 if second not in group:
                     group.append(second)
         if len(group) >= 3:
-            return group
+            groups.append(group)
+    return groups if groups else False
+
+
+def flatten(groups):
+    """Flattens list of groups into list of tiles"""
+    return [tile for group in groups for tile in group]
+
+
+def difference(first, second):
+    """Removes the second list of tiles
+    from the first list of tiles"""
+    if first and second:  # confirm existence
+        for k in second:
+            if k in first:
+                first.remove(k)  # remove first occurrence
+    return first
+
+
+def initial_meld(hand):
+    """sum of opening play must be >= 30
+    Returns list of sets, or false"""
+    sets = []
+    hand1 = hand[:]
+    j = run(hand)
+    if j:
+        difference(hand1, flatten(j))
+        sets.extend(j)
+    k = group(hand)
+    if k:
+        difference(hand1, flatten(k))
+        sets.extend(k)
+    set_sum = flatten(sets)
+    set_sum = sum([(k % 13) if (k % 13 != 0) else 13 for k in set_sum])
+    if set_sum >= 30:
+        return sets
     return False
 
 
-"""
-Sets with 3 elements don't branch the game tree
-Each group with 4 tiles creates 4 more options in the game tree
-Runs can be 3 < n < 13:
-Ways to divide a string of n into segments, each one =>3
-For runs 5 < n, we have the option of spliting them into sub-runs,
-Thankfully, this is rare, so it almost always will not affect runtime4
-"""
+def gen_hand(pool):
+    hand = []
+    for i in range(1, 14):
+        k = randrange(len(pool))
+        hand.append(pool.pop(k))
+    return hand
 
 
-def turn(hand):
-    pass
-
-# def initial_meld(hand):
-#     """sum of opening play must be >- 30"""
-#     recursive_meld(hand)
-#
-#
-# def recursive_meld(hand, groups=[], path=[]):
-#     """use backtracking to find largest initial_meld """
-#     pass
-#
+def gen_pool() -> list:
+    tiles = []
+    for n in range(DECKS):  # default=2
+        for i in range(53):
+            tiles.append(i)
+    return tiles
 
 
-def old_init_meld(hand):
-    group = group_check(hand)
-    run = run_check(hand)
-    score = 0
-    if run:
-        for tile in run:
-            to_add = tile % 13
-            if to_add == 0:
-                score += 13
+def set_print(hand: list):
+    for tile in hand:
+        tile_print(tile)
+
+
+def tile_print(tile: int):
+    if tile == 0:
+        print(OUT[RED] + "☺ " + NORMAL, end=' ')
+    for color in OUT:
+        if tile in color:
+            if (tile % 13):
+                print(OUT[color] + str(tile % 13) + NORMAL, end=' ')
             else:
-                score += to_add
-    if group:
-        for tile in group:
-            to_add = tile % 13
-            if to_add == 0:
-                score += 13
-            else:
-                score += to_add
-    if score >= 30:
-        if run:
-            print("Run: ", end='')
-            hand_print(run)
-        if group:
-            print("Group: ", end='')
-            hand_print(group)
-        return True
+                print(OUT[color] + str(13) + NORMAL, end=' ')
+
+
+def turn(hand, pool, table):
+    """
+    Return false if no piece played"""
     return False
 
 
 def draw(pool, hand):
-    k = randrange(len(pool))
-    hand.append(pool.pop(k))
-    return pool, hand
+    if pool:
+        k = randrange(len(pool))
+        hand.append(pool.pop(k))
+
+
+def status(hand, pool, table):
+    """Recieve table unflattened"""
+    print("Hand:", end=' ')
+    set_print(hand)
+    print()
+    if table:
+        print("Table:", end=' ')
+        for k in table:
+            set_print(k)
+            if k != table[-1]:
+                print(end=", ")
+    # print("Pool:", end=' ')
+    # set_print(pool)
+    # print("Tiles in pool: " + str(len(pool)))
+    print()
 
 
 def play():
-    pool = pool_gen()
-    pool, hand = hand_gen(pool)
-    print(hand)
-    hand_print(hand)
+    table = []
+    pool = gen_pool()
+    hand = gen_hand(pool)
     hand.sort()
-    hand_print(hand)
+    shuffle(pool)
+    turn = 1
     while True:
-        hand_print(hand)
-        if old_init_meld(hand):
+        print("Turn " + str(turn) + ':')
+        status(hand, pool, table)
+        sets = initial_meld(hand)
+        if sets:
+            table.extend(sets)
+            hand = difference(hand, flatten(sets))
+            status(hand, pool, table)
             break
-        else:
-            pool, hand = draw(pool, hand)
-    # game()
+        draw(pool, hand)
+        hand.sort()  # not necessary, but nice
+        turn += 1
+    # while hand:
+        # turn()
     print('Thank you for the game.')
 
 

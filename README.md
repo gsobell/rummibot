@@ -31,10 +31,9 @@ python rummibot.py
 ### Current
 - Colored tiles
 - Game setup
-- Select initial meld from hand
+- Select initial valid meld from hand
 
 ### Future
-- Simple placement
 - Backtracking
 - Count cards (tiles?)
 - Count each players remaining tiles
@@ -45,3 +44,10 @@ python rummibot.py
 - Tile shuffling animation
 - Easy to use GUI/TUI
 - Rewrite in [hylang](https://hylang.org/)
+
+`rummibot` is a work in progress
+
+***
+#### See also:
+- [The Complexity of Rummikub Problems](https://liacs.leidenuniv.nl/~takesfw/pdf/rummikub.pdf)
+- [slides for the above paper](https://ml.informatik.uni-freiburg.de/wp-content/uploads/papers/15-BNAIC-Complexity-slides.pdf)

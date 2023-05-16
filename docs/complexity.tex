@@ -1,0 +1,58 @@
+\documentclass[11pt]{article}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\usepackage{tikz}
+% \usepackage{tikz-cd}
+% \usepackage{float}
+% \usepackage{wrapfig}
+% \usepackage{listings}
+
+    \title{%
+    \textbf{rummibot} \\
+    \large On Computer Rummikub\\ and Game Complexity}
+
+    \author{gsobell}
+    \date{}
+    \addtolength{\topmargin}{-3cm}
+    \addtolength{\textheight}{3cm}
+\begin{document}
+\maketitle
+\pagenumbering{arabic}
+
+\begin{abstract}
+Just some notes and thoughts from develepment.
+In the future, I might include pseudocode, if I port to another language. Find a mistake? Let me know, open a pull request!
+\end{abstract}
+The following sections have to deal with how different scenarios affect game tree branching and complexity.
+
+% $$\text{Ways to choose 14 tiles: } \binom{106}{14} \approx 1.0571 \times 10^{17}  $$
+
+\section{Jokers}
+There are two Jokers in the deck. Each Joker can assume any of the 52 unique tiles. If your opening hand had a joker, that means there are 52 hands to check. If you had both jokers, that increases the number of possible hands to check $52^2 =  2704$.
+% Probability of choosing a joker:
+% \begin{align*}
+% \frac{1}{106} + \frac{1}{103} + \cdots + \frac{1}{92} =\frac{92}{}
+% \end{align*}
+
+
+\section{Sets}
+Sets with 3 elements don't branch the game tree
+
+\subsection{Groups}
+Groups can either be $n = 3$ or $n = 4$ long.
+Each group with 4 tiles creates 4 more options in the game tree.
+
+\subsection{Runs}
+Runs can be $3 \le n \le 13$ long. Each run with $n \ge 3$ can be split multiple ways.
+For a run of length $n$, any unique partitining that make a sub-run of 3 or more adds a case to searched.
+% do the math here
+Thankfully, larger runs are excedingly rare, so it almost always will not affect runtime.
+
+
+
+
+
+
+\end{document}

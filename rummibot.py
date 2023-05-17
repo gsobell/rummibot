@@ -23,6 +23,7 @@ from random import randrange
 from random import shuffle
 
 DECKS = 2  # default=2, 106 tiles
+PLAYERS = 3
 
 BLACK = range(1, 14)
 RED = range(14, 27)
@@ -187,13 +188,17 @@ def status(hand, pool, table):
 
 def play():
     table = []
+    hands = []
     pool = gen_pool()
-    hand = gen_hand(pool)
-    hand.sort()
+    for player in range(0, PLAYERS):
+        hands.append(gen_hand(pool))
+        hands[player].sort()
     shuffle(pool)
     turn = 1
+    player = 0
     while True:
-        print("Turn " + str(turn) + ':')
+        hand = hands[player]
+        print("Player " + str(player + 1) + ", Turn " + str(turn) + ':')
         status(hand, pool, table)
         sets = initial_meld(hand)
         if sets:
@@ -204,8 +209,7 @@ def play():
         draw(pool, hand)
         hand.sort()  # not necessary, but nice
         turn += 1
-    # while hand:
-        # turn()
+        player = (player + 1) % PLAYERS
     print('Thank you for the game.')
 
 
